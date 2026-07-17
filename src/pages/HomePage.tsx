@@ -27,6 +27,7 @@ const initialScriptures: Scripture[] = [
 function HomePage() {
   const [scriptures, setScriptures] = useState(initialScriptures)
   const [selectedId, setSelectedId] = useState(initialScriptures[0]?.id ?? '')
+  const [isEditing, setIsEditing] = useState(true)
 
   const selectedScripture = useMemo(
     () => scriptures.find((item) => item.id === selectedId) ?? null,
@@ -40,17 +41,35 @@ function HomePage() {
   return (
     <div className="page-shell">
       <header className="hero">
-        <div>
+        <div className="hero-copy">
           <p className="eyebrow">Религия святого жука</p>
           <h1>Хранилище писаний</h1>
-          <p className="hero-text">Просматривайте тексты и правьте их в одном месте.</p>
+          <p className="hero-text">Просматривайте священные тексты или переходите в режим правки.</p>
         </div>
-        <img className="hero-symbol" src="/beetle.jpg" alt="Символ святого жука" />
+        <div className="hero-actions">
+          <button type="button" className={`mode-toggle ${isEditing ? 'active' : ''}`} onClick={() => setIsEditing(true)}>
+            Редактировать
+          </button>
+          <button type="button" className={`mode-toggle ${!isEditing ? 'active' : ''}`} onClick={() => setIsEditing(false)}>
+            Просмотр
+          </button>
+          <img className="hero-symbol" src="/juk.png" alt="Символ святого жука" />
+        </div>
       </header>
 
       <main className="workspace">
         <ScriptureList scriptures={scriptures} selectedId={selectedId} onSelect={setSelectedId} />
-        <EditorPanel scripture={selectedScripture} onSave={handleSave} />
+        {isEditing ? (
+          <EditorPanel scripture={selectedScripture} onSave={handleSave} />
+        ) : (
+          <section className="panel view-panel">
+            <div className="panel-header">
+              <h2>{selectedScripture?.title ?? 'Выберите писание'}</h2>
+              <span>{selectedScripture?.category ?? ''}</span>
+            </div>
+            <p className="view-content">{selectedScripture?.content ?? 'Выберите текст из списка, чтобы открыть его в режиме просмотра.'}</p>
+          </section>
+        )}
       </main>
     </div>
   )
