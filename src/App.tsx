@@ -1,12 +1,8 @@
 import './App.css'
+import HomePage from './pages/HomePage'
 
 function App() {
-  return (
-    <div className="container">
-      <h1>🪲 Святой жук</h1>
-      <p>Добро пожаловать в святилище писаний святого жука</p>
-    </div>
-  )
+  return <HomePage />
 }
 
 export default App
