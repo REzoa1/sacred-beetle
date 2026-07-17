@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { Scripture } from '../types/scripture'
 
 interface EditorPanelProps {
@@ -7,9 +7,15 @@ interface EditorPanelProps {
 }
 
 function EditorPanel({ scripture, onSave }: EditorPanelProps) {
-  const [title, setTitle] = useState(scripture?.title ?? '')
-  const [category, setCategory] = useState(scripture?.category ?? '')
-  const [content, setContent] = useState(scripture?.content ?? '')
+  const [title, setTitle] = useState('')
+  const [category, setCategory] = useState('Священные тексты')
+  const [content, setContent] = useState('')
+
+  useEffect(() => {
+    setTitle(scripture?.title ?? '')
+    setCategory(scripture?.category ?? 'Священные тексты')
+    setContent(scripture?.content ?? '')
+  }, [scripture])
 
   if (!scripture) {
     return (
@@ -23,8 +29,8 @@ function EditorPanel({ scripture, onSave }: EditorPanelProps) {
   const handleSave = () => {
     onSave({
       ...scripture,
-      title,
-      category,
+      title: title.trim() || 'Без названия',
+      category: category.trim() || 'Священные тексты',
       content,
       updatedAt: new Date(),
     })
@@ -46,7 +52,12 @@ function EditorPanel({ scripture, onSave }: EditorPanelProps) {
 
       <label>
         Категория
-        <input value={category} onChange={(event) => setCategory(event.target.value)} />
+        <select value={category} onChange={(event) => setCategory(event.target.value)}>
+          <option value="Священные тексты">Священные тексты</option>
+          <option value="Обряды">Обряды</option>
+          <option value="Пророчества">Пророчества</option>
+          <option value="Литании">Литании</option>
+        </select>
       </label>
 
       <label>

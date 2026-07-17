@@ -1,22 +1,42 @@
+:root {
+  --font-heading: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Inter', 'Segoe UI', Arial, sans-serif;
+  --bg: #f5efe6;
+  --panel: rgba(255, 250, 243, 0.95);
+  --ink: #23313b;
+  --muted: #6f675f;
+  --accent: #4c6472;
+  --accent-strong: #2d3b49;
+  --border: rgba(62, 74, 87, 0.16);
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: linear-gradient(135deg, #efe2c9 0%, #f8f3eb 100%);
+  color: var(--ink);
+}
+
 .page-shell {
   max-width: 1280px;
   margin: 0 auto;
   padding: 1.25rem;
-  background: linear-gradient(135deg, #f6f2ea 0%, #ece4d6 100%);
+  background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.68), transparent 34%), var(--bg);
   min-height: 100vh;
 }
 
 .hero {
-  background: linear-gradient(135deg, #23313b 0%, #35495a 100%);
+  background: linear-gradient(135deg, #1e2b35 0%, #344a58 100%);
   color: #f6efe7;
-  padding: 1.25rem 1.4rem;
+  padding: 1.35rem 1.45rem;
   margin-bottom: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 10px 24px rgba(24, 32, 38, 0.16);
+  box-shadow: 0 16px 32px rgba(24, 32, 38, 0.2);
+  border-radius: 22px;
 }
 
 .hero-copy {
@@ -47,9 +67,10 @@
 }
 
 .hero h1 {
-  font-size: 1.75rem;
+  font-size: 1.9rem;
   margin-bottom: 0.35rem;
-  font-family: 'Georgia', 'Times New Roman', serif;
+  font-family: var(--font-heading);
+  letter-spacing: 0.02em;
 }
 
 .hero-text {
@@ -62,9 +83,15 @@
   border: 1px solid rgba(255, 255, 255, 0.14);
   background: rgba(255, 255, 255, 0.08);
   color: #f9f2e8;
-  padding: 0.55rem 0.85rem;
+  padding: 0.58rem 0.9rem;
   cursor: pointer;
   font: inherit;
+  border-radius: 999px;
+  transition: transform 0.16s ease, background 0.16s ease;
+}
+
+.mode-toggle:hover {
+  transform: translateY(-1px);
 }
 
 .mode-toggle.active {
@@ -75,10 +102,11 @@
 .status-banner {
   margin-bottom: 0.8rem;
   padding: 0.8rem 1rem;
-  background: #e8efe7;
+  background: rgba(231, 240, 224, 0.92);
   color: #35513b;
   border: 1px solid #c5d8c2;
   font-size: 0.95rem;
+  border-radius: 14px;
 }
 
 .workspace {
@@ -88,10 +116,11 @@
 }
 
 .panel {
-  background: #f8f3eb;
-  border: 1px solid #d9cdbb;
+  background: var(--panel);
+  border: 1px solid var(--border);
   padding: 1rem;
-  box-shadow: 0 8px 20px rgba(29, 33, 39, 0.06);
+  box-shadow: 0 10px 24px rgba(29, 33, 39, 0.06);
+  border-radius: 20px;
 }
 
 .panel-header {
@@ -105,12 +134,57 @@
 
 .panel-header h2 {
   color: #2f3d49;
-  font-family: 'Georgia', 'Times New Roman', serif;
+  font-family: var(--font-heading);
+  margin: 0;
+}
+
+.panel-subtitle {
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
 }
 
 .panel-header span {
   color: #7c6b56;
   font-size: 0.9rem;
+}
+
+.toolbar-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.filter-field select,
+.editor-panel select,
+.editor-panel input,
+.editor-panel textarea {
+  border: 1px solid #c9bda7;
+  padding: 0.7rem;
+  font: inherit;
+  resize: vertical;
+  background: #fcf9f3;
+  border-radius: 10px;
+}
+
+.create-button {
+  border: none;
+  padding: 0.7rem 0.95rem;
+  background: linear-gradient(135deg, var(--accent-strong), var(--accent));
+  color: #f7efe5;
+  cursor: pointer;
+  border-radius: 999px;
+  font: inherit;
 }
 
 .scripture-list {
@@ -121,15 +195,17 @@
 
 .scripture-card {
   border: 1px solid #d9cdbb;
-  padding: 0.8rem;
+  padding: 0.85rem;
   text-align: left;
   background: #f3eadf;
   cursor: pointer;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.16s ease;
+  border-radius: 14px;
 }
 
 .scripture-card:hover {
   border-color: #7b8f9f;
+  transform: translateY(-1px);
 }
 
 .scripture-card.active {
@@ -164,21 +240,13 @@
   color: #2f3d49;
 }
 
-.editor-panel input,
-.editor-panel textarea {
-  border: 1px solid #c9bda7;
-  padding: 0.7rem;
-  font: inherit;
-  resize: vertical;
-  background: #fcf9f3;
-}
-
 .save-button {
   border: none;
-  padding: 0.55rem 0.9rem;
+  padding: 0.6rem 0.95rem;
   background: #324a5a;
   color: #f7efe5;
   cursor: pointer;
+  border-radius: 999px;
 }
 
 .view-panel .view-content {
@@ -209,6 +277,7 @@
 
   .hero-actions {
     width: 100%;
+        justify-content: center;
   }
 
   .workspace {
@@ -226,6 +295,10 @@
   }
 
   .mode-toggle {
+    width: 100%;
+  }
+
+  .create-button {
     width: 100%;
   }
 

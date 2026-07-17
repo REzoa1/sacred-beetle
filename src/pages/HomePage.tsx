@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import EditorPanel from '../components/EditorPanel'
 import ScriptureList from '../components/ScriptureList'
-import { loadScriptures, saveScripture } from '../services/scriptureService'
+import { loadScriptures, saveScripture, saveScriptures } from '../services/scriptureService'
 import type { Scripture } from '../types/scripture'
 
 function HomePage() {
   const [scriptures, setScriptures] = useState<Scripture[]>([])
   const [selectedId, setSelectedId] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('all')
   const [isEditing, setIsEditing] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [statusMessage, setStatusMessage] = useState<string | null>(null)
@@ -15,6 +16,21 @@ function HomePage() {
     () => scriptures.find((item) => item.id === selectedId) ?? null,
     [scriptures, selectedId],
   )
+
+  const categories = useMemo(() => {
+    const names = scriptures
+      .map((item) => item.category)
+      .filter(Boolean)
+    return Array.from(new Set(names))
+  }, [scriptures])
+
+  const visibleScriptures = useMemo(() => {
+    if (selectedCategory === 'all') {
+      return scriptures
+    }
+
+    return scriptures.filter((item) => item.category === selectedCategory)
+  }, [scriptures, selectedCategory])
 
   useEffect(() => {
     const hydrate = async () => {
@@ -33,6 +49,25 @@ function HomePage() {
     setScriptures(next)
     await saveScripture(updated)
     setStatusMessage('Сохранено и отправлено в backend.')
+  }
+
+  const handleCreate = async () => {
+    const newScripture: Scripture = {
+      id: `scripture-${Date.now()}`,
+      title: 'Новый текст',
+      content: 'Начните писать новое писание здесь…',
+      category: 'Священные тексты',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+
+    const next = [newScripture, ...scriptures]
+    setScriptures(next)
+    setSelectedId(newScripture.id)
+    setSelectedCategory('all')
+    setIsEditing(true)
+    await saveScriptures(next)
+    setStatusMessage('Создан новый текст. Начните редактировать его прямо сейчас.')
   }
 
   if (isLoading) {
@@ -61,7 +96,15 @@ function HomePage() {
       {statusMessage ? <div className="status-banner">{statusMessage}</div> : null}
 
       <main className="workspace">
-        <ScriptureList scriptures={scriptures} selectedId={selectedId} onSelect={setSelectedId} />
+        <ScriptureList
+          scriptures={visibleScriptures}
+          selectedId={selectedId}
+          onSelect={setSelectedId}
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          onCreate={handleCreate}
+        />
         {isEditing ? (
           <EditorPanel scripture={selectedScripture} onSave={handleSave} />
         ) : (
