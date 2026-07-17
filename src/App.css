@@ -72,6 +72,15 @@
   color: #23313b;
 }
 
+.status-banner {
+  margin-bottom: 0.8rem;
+  padding: 0.8rem 1rem;
+  background: #e8efe7;
+  color: #35513b;
+  border: 1px solid #c5d8c2;
+  font-size: 0.95rem;
+}
+
 .workspace {
   display: grid;
   grid-template-columns: 0.92fr 1.08fr;

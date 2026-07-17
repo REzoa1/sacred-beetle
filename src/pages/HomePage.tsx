@@ -1,41 +1,42 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import EditorPanel from '../components/EditorPanel'
 import ScriptureList from '../components/ScriptureList'
+import { loadScriptures, saveScripture } from '../services/scriptureService'
 import type { Scripture } from '../types/scripture'
 
-const initialScriptures: Scripture[] = [
-  {
-    id: '1',
-    title: 'Песнь о Скрытом Жуке',
-    content:
-      'В начале был тихий скрип, и он повёл за собой тех, кто слышал его в темноте. И каждый, кто отыскал его след, обрёл путь к созерцанию.',
-    category: 'Священные тексты',
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-01-01'),
-  },
-  {
-    id: '2',
-    title: 'Клятва Панциря',
-    content:
-      'Пусть твой шаг будет ровен, а голос — как ржавый колокол в тумане. И тогда в тебе останется свет, не видимый, но верный.',
-    category: 'Обряды',
-    createdAt: new Date('2024-01-02'),
-    updatedAt: new Date('2024-01-02'),
-  },
-]
-
 function HomePage() {
-  const [scriptures, setScriptures] = useState(initialScriptures)
-  const [selectedId, setSelectedId] = useState(initialScriptures[0]?.id ?? '')
-  const [isEditing, setIsEditing] = useState(true)
+  const [scriptures, setScriptures] = useState<Scripture[]>([])
+  const [selectedId, setSelectedId] = useState('')
+  const [isEditing, setIsEditing] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [statusMessage, setStatusMessage] = useState<string | null>(null)
 
   const selectedScripture = useMemo(
     () => scriptures.find((item) => item.id === selectedId) ?? null,
     [scriptures, selectedId],
   )
 
-  const handleSave = (updated: Scripture) => {
-    setScriptures((current) => current.map((item) => (item.id === updated.id ? updated : item)))
+  useEffect(() => {
+    const hydrate = async () => {
+      const loaded = await loadScriptures()
+      setScriptures(loaded.scriptures)
+      setSelectedId((current) => current || loaded.scriptures[0]?.id || '')
+      setStatusMessage(loaded.message ?? null)
+      setIsLoading(false)
+    }
+
+    void hydrate()
+  }, [])
+
+  const handleSave = async (updated: Scripture) => {
+    const next = scriptures.map((item) => (item.id === updated.id ? updated : item))
+    setScriptures(next)
+    await saveScripture(updated)
+    setStatusMessage('Сохранено и отправлено в backend.')
+  }
+
+  if (isLoading) {
+    return <div className="page-shell loading-state">Загрузка писаний…</div>
   }
 
   return (
@@ -56,6 +57,8 @@ function HomePage() {
           <img className="hero-symbol" src="/juk.png" alt="Символ святого жука" />
         </div>
       </header>
+
+      {statusMessage ? <div className="status-banner">{statusMessage}</div> : null}
 
       <main className="workspace">
         <ScriptureList scriptures={scriptures} selectedId={selectedId} onSelect={setSelectedId} />
