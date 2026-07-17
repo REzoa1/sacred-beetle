@@ -4,9 +4,10 @@ import type { Scripture } from '../types/scripture'
 interface EditorPanelProps {
   scripture: Scripture | null
   onSave: (updated: Scripture) => void
+  onDelete: () => void
 }
 
-function EditorPanel({ scripture, onSave }: EditorPanelProps) {
+function EditorPanel({ scripture, onSave, onDelete }: EditorPanelProps) {
   const [title, setTitle] = useState('')
   const [category, setCategory] = useState('Священные тексты')
   const [content, setContent] = useState('')
@@ -40,9 +41,14 @@ function EditorPanel({ scripture, onSave }: EditorPanelProps) {
     <section className="panel editor-panel">
       <div className="panel-header">
         <h2>Редактор</h2>
-        <button type="button" className="save-button" onClick={handleSave}>
-          Сохранить
-        </button>
+        <div className="panel-actions">
+          <button type="button" className="ghost-button" onClick={onDelete}>
+            Удалить
+          </button>
+          <button type="button" className="save-button" onClick={handleSave}>
+            Сохранить
+          </button>
+        </div>
       </div>
 
       <label>

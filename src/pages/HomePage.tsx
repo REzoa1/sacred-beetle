@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import EditorPanel from '../components/EditorPanel'
 import ScriptureList from '../components/ScriptureList'
-import { loadScriptures, saveScripture, saveScriptures } from '../services/scriptureService'
+import { deleteScripture, loadScriptures, saveScripture, saveScriptures } from '../services/scriptureService'
 import type { Scripture } from '../types/scripture'
 
 function HomePage() {
@@ -70,6 +70,19 @@ function HomePage() {
     setStatusMessage('Создан новый текст. Начните редактировать его прямо сейчас.')
   }
 
+  const handleDelete = async () => {
+    if (!selectedScripture) {
+      return
+    }
+
+    const next = scriptures.filter((item) => item.id !== selectedScripture.id)
+    setScriptures(next)
+    setSelectedId(next[0]?.id ?? '')
+    setIsEditing(false)
+    await deleteScripture(selectedScripture.id)
+    setStatusMessage('Текст удалён из хранилища.')
+  }
+
   if (isLoading) {
     return <div className="page-shell loading-state">Загрузка писаний…</div>
   }
@@ -106,7 +119,7 @@ function HomePage() {
           onCreate={handleCreate}
         />
         {isEditing ? (
-          <EditorPanel scripture={selectedScripture} onSave={handleSave} />
+          <EditorPanel scripture={selectedScripture} onSave={handleSave} onDelete={handleDelete} />
         ) : (
           <section className="panel view-panel">
             <div className="panel-header">

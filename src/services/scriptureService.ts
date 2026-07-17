@@ -92,6 +92,21 @@ export const saveScripture = async (scripture: Scripture): Promise<void> => {
   }
 }
 
+export const deleteScripture = async (scriptureId: string): Promise<void> => {
+  const saved = localStorage.getItem(STORAGE_KEY)
+  const current = saved ? (JSON.parse(saved) as Scripture[]) : []
+  const next = current.filter((item) => item.id !== scriptureId)
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+
+  try {
+    await fetch(`${BACKEND_URL}/${encodeURIComponent(scriptureId)}`, {
+      method: 'DELETE',
+    })
+  } catch {
+    // keep local storage as fallback
+  }
+}
+
 export const saveScriptures = async (scriptures: Scripture[]): Promise<void> => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(scriptures))
 
