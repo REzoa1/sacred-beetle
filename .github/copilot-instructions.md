@@ -11,7 +11,6 @@
 ## Основные структуры
 
 - `src/types/scripture.ts` - типы данных для писаний и категорий
-- `src/services/firebase.ts` - Firebase конфигурация и сервисы
 - `src/components/` - React компоненты
 - `src/pages/` - страницы приложения
 
