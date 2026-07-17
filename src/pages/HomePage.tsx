@@ -45,6 +45,7 @@ function HomePage() {
           <h1>Хранилище писаний</h1>
           <p className="hero-text">Просматривайте тексты и правьте их в одном месте.</p>
         </div>
+        <img className="hero-symbol" src="/beetle.jpg" alt="Символ святого жука" />
       </header>
 
       <main className="workspace">
