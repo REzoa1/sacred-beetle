@@ -13,6 +13,7 @@ function HomePage() {
   const [scriptures, setScriptures] = useState<Scripture[]>([]);
   const [selectedId, setSelectedId] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -28,12 +29,21 @@ function HomePage() {
   }, [scriptures]);
 
   const visibleScriptures = useMemo(() => {
-    if (selectedCategory === "all") {
-      return scriptures;
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+    const byCategory =
+      selectedCategory === "all"
+        ? scriptures
+        : scriptures.filter((item) => item.category === selectedCategory);
+
+    if (!normalizedQuery) {
+      return byCategory;
     }
 
-    return scriptures.filter((item) => item.category === selectedCategory);
-  }, [scriptures, selectedCategory]);
+    return byCategory.filter((item) => {
+      const haystack = `${item.title} ${item.content} ${item.category}`.toLowerCase();
+      return haystack.includes(normalizedQuery);
+    });
+  }, [scriptures, selectedCategory, searchQuery]);
 
   useEffect(() => {
     const hydrate = async () => {
@@ -46,6 +56,17 @@ function HomePage() {
 
     void hydrate();
   }, []);
+
+  useEffect(() => {
+    if (!visibleScriptures.length) {
+      setSelectedId("");
+      return;
+    }
+
+    if (!visibleScriptures.some((item) => item.id === selectedId)) {
+      setSelectedId(visibleScriptures[0].id);
+    }
+  }, [selectedId, visibleScriptures]);
 
   const handleSave = async (updated: Scripture) => {
     const next = scriptures.map((item) =>
@@ -138,7 +159,9 @@ function HomePage() {
           onSelect={setSelectedId}
           categories={categories}
           selectedCategory={selectedCategory}
+          searchQuery={searchQuery}
           onCategoryChange={setSelectedCategory}
+          onSearchChange={setSearchQuery}
           onCreate={handleCreate}
         />
         {isEditing ? (
@@ -150,13 +173,28 @@ function HomePage() {
         ) : (
           <section className="panel view-panel">
             <div className="panel-header">
-              <h2>{selectedScripture?.title ?? "Выберите писание"}</h2>
-              <span>{selectedScripture?.category ?? ""}</span>
+              <div>
+                <h2>{selectedScripture?.title ?? "Выберите писание"}</h2>
+                <p className="panel-subtitle">
+                  {selectedScripture?.category ?? "Выберите текст из списка"}
+                </p>
+              </div>
+              {selectedScripture ? (
+                <span>
+                  {selectedScripture.updatedAt.toLocaleDateString("ru-RU")}
+                </span>
+              ) : null}
             </div>
-            <p className="view-content">
-              {selectedScripture?.content ??
-                "Выберите текст из списка, чтобы открыть его в режиме просмотра."}
-            </p>
+            {selectedScripture ? (
+              <div className="view-body">
+                <div className="quote-mark">“</div>
+                <p className="view-content">{selectedScripture.content}</p>
+              </div>
+            ) : (
+              <p className="view-content empty-view">
+                Выберите текст из списка, чтобы открыть его в режиме просмотра.
+              </p>
+            )}
           </section>
         )}
       </main>
