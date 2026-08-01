@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import { Dialog, DialogContent, DialogTitle, IconButton, useMediaQuery } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import EditorPanel from "../components/EditorPanel";
 import ScriptureList from "../components/ScriptureList";
 import {
@@ -17,6 +19,8 @@ function HomePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [isReaderOpen, setIsReaderOpen] = useState(false);
+  const isMobile = useMediaQuery("(max-width: 900px)");
 
   const selectedScripture = useMemo(
     () => scriptures.find((item) => item.id === selectedId) ?? null,
@@ -71,6 +75,9 @@ function HomePage() {
   const handleSelect = (scriptureId: string) => {
     setSelectedId(scriptureId);
     setIsEditing(false);
+    if (isMobile) {
+      setIsReaderOpen(true);
+    }
   };
 
   const handleEdit = (scriptureId: string) => {
@@ -196,6 +203,22 @@ function HomePage() {
           </section>
         )}
       </main>
+
+      <Dialog open={isReaderOpen && Boolean(selectedScripture) && isMobile} onClose={() => setIsReaderOpen(false)} fullWidth maxWidth="sm">
+        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span>{selectedScripture?.title ?? 'Писание'}</span>
+          <IconButton onClick={() => setIsReaderOpen(false)} size="small">
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers>
+          <div className="reader-illustration">
+            <img src={`${import.meta.env.BASE_URL}juk.png`} alt="Святой жук" />
+            <img src={`${import.meta.env.BASE_URL}juk_zloy.png`} alt="Ядовитый жук" />
+          </div>
+          <p className="view-content reader-content">{selectedScripture?.content ?? ''}</p>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
