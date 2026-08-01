@@ -18,6 +18,28 @@ const normalizeScripture = (item: Record<string, unknown>): Scripture => ({
 });
 
 const BACKEND_URL = "https://sacred-beetle-backend.onrender.com/api/scriptures";
+const FALLBACK_DATA_URL = "/data/scriptures.json";
+
+const loadLocalScriptures = async (): Promise<Scripture[]> => {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved) as Scripture[];
+      if (parsed.length > 0) {
+        return parsed;
+      }
+    } catch {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }
+
+  const response = await fetch(FALLBACK_DATA_URL);
+  const data = (await response.json()) as Record<string, unknown>[];
+  const scriptures = data.map((item) => normalizeScripture(item));
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(scriptures));
+  return scriptures;
+};
 
 export const loadScriptures = async (): Promise<ScriptureLoadResult> => {
   try {
@@ -26,44 +48,28 @@ export const loadScriptures = async (): Promise<ScriptureLoadResult> => {
       const data = (await response.json()) as Record<string, unknown>[];
       const scriptures = data.map((item) => normalizeScripture(item));
 
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(scriptures));
-      return {
-        scriptures,
-        source: "backend",
-        message: "Загружены тексты из бэкенда.",
-      };
+      if (scriptures.length >= 3) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(scriptures));
+        return {
+          scriptures,
+          source: "backend",
+          message: "Загружены тексты из бэкенда.",
+        };
+      }
     }
   } catch {
     // fallback below
   }
 
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (saved) {
-    try {
-      const parsed = JSON.parse(saved) as Scripture[];
-      return {
-        scriptures: parsed,
-        source: "local",
-        message: "Показываю сохранённые локально тексты.",
-      };
-    } catch {
-      localStorage.removeItem(STORAGE_KEY);
-    }
-  }
-
   try {
-    const response = await fetch("/data/scriptures.json");
-    const data = (await response.json()) as Record<string, unknown>[];
-    const scriptures = data.map((item) => normalizeScripture(item));
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(scriptures));
+    const scriptures = await loadLocalScriptures();
     return {
       scriptures,
-      source: "mock",
-      message: "Загружены тексты из каталога сайта.",
+      source: scriptures.length > 0 ? "local" : "mock",
+      message: "Показываю сохранённые локально тексты.",
     };
   } catch (error) {
-    console.error("Failed to load scriptures from public data", error);
+    console.error("Failed to load scriptures from local data", error);
     localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
     return {
       scriptures: [],
