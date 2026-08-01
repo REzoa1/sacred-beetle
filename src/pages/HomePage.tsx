@@ -186,7 +186,13 @@ function HomePage() {
               </div>
               {selectedScripture ? (
                 <span>
-                  {selectedScripture.updatedAt.toLocaleDateString("ru-RU")}
+                  {(() => {
+                    const value = selectedScripture.updatedAt;
+                    const date = value instanceof Date ? value : new Date(String(value ?? ""));
+                    return Number.isNaN(date.getTime())
+                      ? "—"
+                      : date.toLocaleDateString("ru-RU");
+                  })()}
                 </span>
               ) : null}
             </div>

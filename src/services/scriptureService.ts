@@ -8,13 +8,18 @@ export type ScriptureLoadResult = {
   message?: string;
 };
 
-const normalizeScripture = (item: Record<string, unknown>): Scripture => ({
+const normalizeDate = (value: unknown): Date => {
+  const date = value instanceof Date ? value : new Date(String(value ?? ""));
+  return Number.isNaN(date.getTime()) ? new Date() : date;
+};
+
+export const normalizeScripture = (item: Record<string, unknown>): Scripture => ({
   id: String(item.id ?? ""),
   title: String(item.title ?? ""),
   content: String(item.content ?? ""),
   category: String(item.category ?? ""),
-  createdAt: item.createdAt ? new Date(String(item.createdAt)) : new Date(),
-  updatedAt: item.updatedAt ? new Date(String(item.updatedAt)) : new Date(),
+  createdAt: normalizeDate(item.createdAt),
+  updatedAt: normalizeDate(item.updatedAt),
 });
 
 const BACKEND_URL = "https://sacred-beetle-backend.onrender.com/api/scriptures";
@@ -24,9 +29,10 @@ const loadLocalScriptures = async (): Promise<Scripture[]> => {
   const saved = localStorage.getItem(STORAGE_KEY);
   if (saved) {
     try {
-      const parsed = JSON.parse(saved) as Scripture[];
-      if (parsed.length > 0) {
-        return parsed;
+      const parsed = JSON.parse(saved) as Record<string, unknown>[];
+      const normalized = parsed.map((item) => normalizeScripture(item));
+      if (normalized.length > 0) {
+        return normalized;
       }
     } catch {
       localStorage.removeItem(STORAGE_KEY);
