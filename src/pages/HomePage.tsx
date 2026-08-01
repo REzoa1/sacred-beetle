@@ -16,7 +16,7 @@ function HomePage() {
   const [selectedId, setSelectedId] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isReaderOpen, setIsReaderOpen] = useState(false);
 
@@ -69,25 +69,15 @@ function HomePage() {
     }
   }, [selectedId, visibleScriptures]);
 
-  useEffect(() => {
-    if (!selectedScripture || isEditing || scriptures.length === 0) {
-      return;
-    }
-
-    if (selectedId) {
-      setIsReaderOpen(false);
-    }
-  }, [selectedScripture, isEditing, scriptures.length, selectedId]);
-
   const handleSelect = (scriptureId: string) => {
     setSelectedId(scriptureId);
-    setIsEditing(false);
+    setIsEditorOpen(false);
     setIsReaderOpen(true);
   };
 
   const handleEdit = (scriptureId: string) => {
     setSelectedId(scriptureId);
-    setIsEditing(true);
+    setIsEditorOpen(true);
     setIsReaderOpen(false);
   };
 
@@ -97,7 +87,7 @@ function HomePage() {
     );
     setScriptures(next);
     await saveScripture(updated);
-    setIsEditing(false);
+    setIsEditorOpen(false);
   };
 
   const handleCreate = async () => {
@@ -114,7 +104,7 @@ function HomePage() {
     setScriptures(next);
     setSelectedId(newScripture.id);
     setSelectedCategory("all");
-    setIsEditing(true);
+    setIsEditorOpen(true);
     setIsReaderOpen(false);
     await saveScriptures(next);
   };
@@ -127,7 +117,7 @@ function HomePage() {
     const next = scriptures.filter((item) => item.id !== selectedScripture.id);
     setScriptures(next);
     setSelectedId(next[0]?.id ?? "");
-    setIsEditing(false);
+    setIsEditorOpen(false);
     setIsReaderOpen(false);
     await deleteScripture(selectedScripture.id);
   };
@@ -143,7 +133,7 @@ function HomePage() {
           <p className="eyebrow">Религия святого жука</p>
           <h1>Хранилище писаний</h1>
           <p className="hero-text">
-            Просматривайте священные тексты или переходите в режим правки.
+            Просматривайте священные тексты или вносите правки.
           </p>
         </div>
         <div className="hero-actions">
@@ -155,12 +145,25 @@ function HomePage() {
         </div>
       </header>
 
-      <main className={`workspace ${isEditing ? "" : "single-column"}`}>
+      <main className="workspace single-column">
         <ScriptureList
           scriptures={visibleScriptures}
           selectedId={selectedId}
           onSelect={handleSelect}
           onEdit={handleEdit}
+          onDelete={async (scriptureId) => {
+            const target = scriptures.find((item) => item.id === scriptureId);
+            if (!target) {
+              return;
+            }
+
+            const next = scriptures.filter((item) => item.id !== scriptureId);
+            setScriptures(next);
+            setSelectedId(next[0]?.id ?? "");
+            setIsEditorOpen(false);
+            setIsReaderOpen(false);
+            await deleteScripture(scriptureId);
+          }}
           categories={categories}
           selectedCategory={selectedCategory}
           searchQuery={searchQuery}
@@ -168,14 +171,29 @@ function HomePage() {
           onSearchChange={setSearchQuery}
           onCreate={handleCreate}
         />
-        {isEditing ? (
+      </main>
+
+      <Dialog
+        open={isEditorOpen && Boolean(selectedScripture)}
+        onClose={() => setIsEditorOpen(false)}
+        fullWidth
+        maxWidth="md"
+        slotProps={{ paper: { sx: { borderRadius: 3, background: 'linear-gradient(145deg, #f8edd4 0%, #ebd7ad 100%)', border: '1px solid rgba(102, 68, 38, 0.2)', boxShadow: '0 18px 44px rgba(80, 50, 26, 0.16)' } } }}
+      >
+        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(102, 68, 38, 0.12)', fontFamily: 'var(--font-heading)', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#4b3320' }}>
+          <span>Редактор писания</span>
+          <IconButton onClick={() => setIsEditorOpen(false)} size="small" sx={{ color: '#6a4522' }}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers sx={{ background: 'rgba(255, 248, 230, 0.76)', paddingTop: 2, paddingBottom: 2 }}>
           <EditorPanel
             scripture={selectedScripture}
             onSave={handleSave}
             onDelete={handleDelete}
           />
-        ) : null}
-      </main>
+        </DialogContent>
+      </Dialog>
 
       <Dialog
         open={isReaderOpen && Boolean(selectedScripture)}

@@ -8,6 +8,7 @@ interface ScriptureListProps {
   categories: string[]
   onSelect: (id: string) => void
   onEdit: (id: string) => void
+  onDelete: (id: string) => void
   onCategoryChange: (category: string) => void
   onSearchChange: (query: string) => void
   onCreate: () => void
@@ -21,6 +22,7 @@ function ScriptureList({
   categories,
   onSelect,
   onEdit,
+  onDelete,
   onCategoryChange,
   onSearchChange,
   onCreate,
@@ -79,13 +81,22 @@ function ScriptureList({
                 <span>{scripture.category}</span>
                 <p>{scripture.content.slice(0, 96)}{scripture.content.length > 96 ? '…' : ''}</p>
               </button>
-              <button
-                type="button"
-                className="scripture-card-edit"
-                onClick={() => onEdit(scripture.id)}
-              >
-                ✎ Ред.
-              </button>
+              <div className="scripture-card-actions">
+                <button
+                  type="button"
+                  className="scripture-card-edit"
+                  onClick={() => onEdit(scripture.id)}
+                >
+                  Ред.
+                </button>
+                <button
+                  type="button"
+                  className="scripture-card-delete"
+                  onClick={() => onDelete(scripture.id)}
+                >
+                  Удал.
+                </button>
+              </div>
             </div>
           ))
         )}

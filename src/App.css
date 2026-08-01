@@ -17,21 +17,50 @@
  :root {
     --font-heading: 'Cormorant Garamond', Georgia, serif;
     --font-body: 'Cormorant Garamond', Georgia, serif;
-    --bg: #2a1d12;
-    --panel: rgba(76, 49, 29, 0.94);
-    --panel-2: rgba(250, 240, 214, 0.96);
-    --ink: #24170f;
-    --ink-light: #f7e9c6;
-    --muted: #b89a68;
-    --muted-light: #dfc993;
-    --accent: #d4a24a;
-    --accent-strong: #8b5e2d;
-    --border: rgba(212, 162, 74, 0.28);
-    --shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
+    --bg: #201915;
+    --panel: rgba(245, 235, 216, 0.97);
+    --panel-2: rgba(233, 222, 196, 0.97);
+    --ink: #2d241f;
+    --ink-light: #f4e5c4;
+    --muted: #8d7557;
+    --muted-light: #c7b085;
+    --accent: #6a5947;
+    --accent-strong: #40342b;
+    --border: rgba(63, 50, 41, 0.24);
+    --shadow: 0 10px 24px rgba(10, 8, 6, 0.24);
 }
 
 * {
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+::selection {
+    background: transparent;
+    color: inherit;
+}
+
+body,
+p,
+span,
+label,
+h1,
+h2,
+h3,
+h4,
+button,
+input,
+textarea,
+select,
+.MuiButton-root,
+.MuiTypography-root,
+.MuiInputBase-root,
+.MuiDialogTitle-root,
+.MuiDialogContent-root {
+    font-family: var(--font-body);
+    font-weight: 600;
 }
 
 html,
@@ -45,8 +74,8 @@ body {
     font-family: var(--font-body);
     color: var(--ink-light);
     background:
-        radial-gradient(circle at top left, rgba(212, 162, 74, 0.18), transparent 28%),
-        linear-gradient(135deg, #22150c 0%, #3a2416 50%, #160f0b 100%);
+        radial-gradient(circle at top left, rgba(120, 96, 71, 0.16), transparent 28%),
+        linear-gradient(135deg, #241b16 0%, #2d241d 48%, #17120e 100%);
     min-height: 100vh;
     letter-spacing: 0.01em;
 }
@@ -57,10 +86,10 @@ body::before {
     inset: 0;
     pointer-events: none;
     background-image:
-        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.05), transparent 26%),
-        radial-gradient(circle at 80% 10%, rgba(212, 162, 74, 0.09), transparent 32%);
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.04), transparent 26%),
+        radial-gradient(circle at 80% 10%, rgba(171, 124, 74, 0.1), transparent 32%);
     background-size: 34px 34px, 34px 34px, auto, auto;
     opacity: 0.18;
     mix-blend-mode: screen;
@@ -73,7 +102,7 @@ body::after {
     pointer-events: none;
     background-image:
         repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.06) 0 1px, transparent 1px 5px),
-        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 4px);
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 4px);
     opacity: 0.12;
 }
 
@@ -89,8 +118,8 @@ body::after {
     content: '';
     position: absolute;
     inset: 0.35rem;
-    border: 1px solid rgba(212, 162, 74, 0.22);
-    border-radius: 24px;
+    border: 1px solid rgba(63, 50, 41, 0.12);
+    border-radius: 12px;
     pointer-events: none;
 }
 
@@ -99,24 +128,24 @@ body::after {
     position: absolute;
     inset: 0.7rem 0.7rem auto 0.7rem;
     height: 36px;
-    background: linear-gradient(90deg, transparent, rgba(212, 162, 74, 0.18), transparent);
-    border-radius: 999px;
+    background: linear-gradient(90deg, transparent, rgba(63, 50, 41, 0.1), transparent);
+    border-radius: 6px;
     pointer-events: none;
 }
 
 .hero {
     position: relative;
-    background: linear-gradient(145deg, rgba(91, 58, 31, 0.96), rgba(58, 35, 20, 0.96));
-    color: #f7ebc6;
+    background: linear-gradient(145deg, rgba(249, 242, 225, 0.99), rgba(233, 217, 185, 0.98));
+    color: #34261d;
     padding: 1.3rem 1.4rem;
     margin-bottom: 0.95rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 1rem;
-    border: 1px solid rgba(212, 162, 74, 0.32);
+    border: 1px solid rgba(63, 50, 41, 0.16);
     box-shadow: var(--shadow);
-    border-radius: 20px;
+    border-radius: 10px;
     overflow: hidden;
 }
 
@@ -124,8 +153,8 @@ body::after {
     content: '';
     position: absolute;
     inset: 12px;
-    border: 1px solid rgba(247, 235, 198, 0.16);
-    border-radius: 14px;
+    border: 1px solid rgba(63, 50, 41, 0.12);
+    border-radius: 10px;
     pointer-events: none;
 }
 
@@ -157,20 +186,34 @@ body::after {
     font-size: 0.72rem;
     opacity: 0.92;
     margin-bottom: 0.38rem;
-    color: #e8c97b;
+    color: #8b5e2d;
 }
 
 .hero h1 {
     font-size: 2.15rem;
     margin: 0 0 0.33rem;
     font-family: var(--font-heading);
+    font-weight: 700;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    color: #4b3320;
+    text-shadow: none;
+}
+
+.hero h1,
+.hero-text,
+.panel-header h2,
+.panel-subtitle,
+.scripture-card strong,
+.scripture-card span,
+.scripture-card p,
+.editor-toolbar h3,
+.editor-toolbar p {
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.24);
 }
 
 .hero-text {
-    color: #efe0bb;
+    color: #5b4635;
     font-size: 0.97rem;
     max-width: 580px;
     line-height: 1.6;
@@ -183,7 +226,7 @@ body::after {
     background: linear-gradient(135deg, rgba(102, 62, 31, 0.95), rgba(72, 44, 22, 0.92));
     color: #f7e9c6;
     border: 1px solid rgba(212, 162, 74, 0.28);
-    border-radius: 999px;
+    border-radius: 8px;
     font-size: 0.95rem;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
@@ -200,11 +243,11 @@ body::after {
 }
 
 .panel {
-    background: linear-gradient(145deg, rgba(96, 61, 35, 0.95), rgba(73, 46, 25, 0.95));
-    border: 1px solid rgba(212, 162, 74, 0.28);
+    background: linear-gradient(145deg, rgba(244, 236, 214, 0.99), rgba(231, 219, 188, 0.98));
+    border: 1px solid rgba(63, 50, 41, 0.16);
     padding: 1rem;
     box-shadow: var(--shadow);
-    border-radius: 18px;
+    border-radius: 10px;
     backdrop-filter: blur(8px);
     position: relative;
     overflow: hidden;
@@ -213,9 +256,9 @@ body::after {
 .panel::before {
     content: '';
     position: absolute;
-    inset: 12px;
-    border: 1px solid rgba(247, 235, 198, 0.14);
-    border-radius: 12px;
+    inset: 10px;
+    border: 1px solid rgba(63, 50, 41, 0.1);
+    border-radius: 8px;
     pointer-events: none;
 }
 
@@ -232,8 +275,9 @@ body::after {
 }
 
 .panel-header h2 {
-    color: #f8ebc2;
+    color: #34261d;
     font-family: var(--font-heading);
+    font-weight: 700;
     margin: 0;
     font-size: 1.24rem;
     letter-spacing: 0.08em;
@@ -242,12 +286,12 @@ body::after {
 
 .panel-subtitle {
     margin: 0.2rem 0 0;
-    color: var(--muted-light);
+    color: var(--muted);
     font-size: 0.9rem;
 }
 
 .panel-header span {
-    color: #d8b877;
+    color: #7f5d35;
     font-size: 0.9rem;
     white-space: nowrap;
 }
@@ -277,14 +321,14 @@ body::after {
 .editor-panel select,
 .editor-panel input,
 .editor-panel textarea {
-    border: 1px solid rgba(212, 162, 74, 0.34);
+    border: 1px solid rgba(63, 50, 41, 0.18);
     padding: 0.72rem 0.8rem;
     font: inherit;
     resize: vertical;
-    background: rgba(255, 248, 228, 0.96);
-    border-radius: 10px;
+    background: rgba(255, 251, 240, 0.96);
+    border-radius: 8px;
     color: var(--ink);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 .filter-field select:focus,
@@ -304,12 +348,12 @@ body::after {
 
 .create-button,
 .save-button {
-    border: 1px solid rgba(212, 162, 74, 0.45);
+    border: 1px solid rgba(63, 50, 41, 0.16);
     padding: 0.72rem 0.96rem;
     background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-    color: #fffdf8;
+    color: #fffdf7;
     cursor: pointer;
-    border-radius: 999px;
+    border-radius: 8px;
     font: inherit;
     box-shadow: 0 8px 16px rgba(120, 74, 24, 0.22);
     transition: transform 0.16s ease, box-shadow 0.16s ease;
@@ -333,27 +377,27 @@ body::after {
 }
 
 .scripture-card {
-    border: 1px solid rgba(212, 162, 74, 0.24);
+    border: 1px solid rgba(63, 50, 41, 0.14);
     padding: 0.86rem;
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 0.65rem;
-    background: linear-gradient(145deg, rgba(250, 240, 214, 0.96), rgba(232, 217, 186, 0.96));
-    transition: border-color 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
-    border-radius: 14px;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 6px 14px rgba(36, 23, 15, 0.08);
+    gap: 0.7rem;
+    background: linear-gradient(145deg, rgba(255, 250, 238, 0.98), rgba(239, 223, 191, 0.98));
+    transition: none;
+    border-radius: 10px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 4px 10px rgba(36, 23, 15, 0.05);
 }
 
 .scripture-card:hover {
-    border-color: rgba(212, 162, 74, 0.56);
-    transform: translateY(-1px);
+    border-color: rgba(63, 50, 41, 0.2);
+    transform: none;
 }
 
 .scripture-card.active {
-    border-color: rgba(176, 116, 27, 0.56);
-    background: linear-gradient(145deg, #f8e9c8, #e4cf9f);
-    box-shadow: 0 8px 20px rgba(36, 23, 15, 0.12);
+    border-color: rgba(63, 50, 41, 0.2);
+    background: linear-gradient(145deg, rgba(255, 250, 238, 0.98), rgba(239, 223, 191, 0.98));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 4px 10px rgba(36, 23, 15, 0.05);
 }
 
 .scripture-card-main {
@@ -364,6 +408,7 @@ body::after {
     text-align: left;
     cursor: pointer;
     color: inherit;
+    min-width: 0;
 }
 
 .scripture-card strong {
@@ -372,6 +417,7 @@ body::after {
     color: #4b3320;
     font-size: 0.98rem;
     font-family: var(--font-heading);
+    font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
 }
@@ -394,24 +440,39 @@ body::after {
     overflow: hidden;
 }
 
-.scripture-card-edit {
-    border: 1px solid rgba(139, 94, 45, 0.24);
-    background: rgba(255, 250, 238, 0.9);
+.scripture-card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    align-items: stretch;
+    flex-shrink: 0;
+}
+
+.scripture-card-edit,
+.scripture-card-delete {
+    border: 1px solid rgba(63, 50, 41, 0.16);
+    background: rgba(255, 248, 232, 0.95);
     color: #6a4522;
-    padding: 0.46rem 0.7rem;
-    border-radius: 999px;
+    padding: 0.42rem 0.7rem;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     white-space: nowrap;
+    font-weight: 700;
+}
+
+.scripture-card-delete {
+    color: #7b4a2d;
+    background: rgba(247, 236, 214, 0.96);
 }
 
 .empty-list,
 .empty-view {
     padding: 1rem;
-    border: 1px dashed rgba(212, 162, 74, 0.25);
-    border-radius: 16px;
-    color: #d9bf8d;
-    background: rgba(255, 255, 255, 0.08);
+    border: 1px dashed rgba(63, 50, 41, 0.18);
+    border-radius: 10px;
+    color: #7f6545;
+    background: rgba(255, 250, 240, 0.72);
 }
 
 .editor-panel label {
@@ -430,13 +491,13 @@ body::after {
 }
 
 .ghost-button {
-    border: 1px solid rgba(212, 162, 74, 0.32);
+    border: 1px solid rgba(63, 50, 41, 0.16);
     background: transparent;
-    color: #f0d8a4;
+    color: #4f3a2b;
     padding: 0.6rem 0.9rem;
     cursor: pointer;
     font: inherit;
-    border-radius: 999px;
+    border-radius: 8px;
 }
 
 .view-panel {
@@ -447,12 +508,12 @@ body::after {
     background:
         linear-gradient(145deg, rgba(250, 239, 208, 0.96), rgba(236, 219, 182, 0.95));
     background-image:
-        radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.36), transparent 24%),
-        repeating-linear-gradient(0deg, rgba(139, 94, 45, 0.03) 0 1px, transparent 1px 6px);
-    border-radius: 14px;
+        radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.24), transparent 24%),
+        repeating-linear-gradient(0deg, rgba(63, 50, 41, 0.03) 0 1px, transparent 1px 6px);
+    border-radius: 10px;
     padding: 1rem 1.1rem;
-    border: 1px solid rgba(212, 162, 74, 0.24);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65), 0 8px 18px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(63, 50, 41, 0.16);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 5px 12px rgba(0, 0, 0, 0.06);
     position: relative;
     z-index: 1;
 }
@@ -473,10 +534,10 @@ body::after {
     width: 84px;
     height: 84px;
     object-fit: contain;
-    border: 1px solid rgba(212, 162, 74, 0.24);
+    border: 1px solid rgba(63, 50, 41, 0.16);
     background: rgba(255, 250, 240, 0.92);
     padding: 0.35rem;
-    border-radius: 12px;
+    border-radius: 8px;
 }
 
 .reader-content {
@@ -514,41 +575,100 @@ body::after {
     justify-content: center;
     align-items: center;
     text-align: center;
-    color: #d4bc84;
+    color: #7d654a;
+}
+
+.editor-shell {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0.1rem;
+}
+
+.editor-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(63, 50, 41, 0.12);
+}
+
+.editor-toolbar h3 {
+    margin: 0 0 0.2rem;
+    color: #34261d;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.15rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.editor-toolbar p {
+    margin: 0;
+    color: #6d553c;
+    font-size: 0.95rem;
+}
+
+.editor-actions {
+    display: flex;
+    gap: 0.6rem;
+}
+
+.editor-action {
+    border: 1px solid rgba(63, 50, 41, 0.16);
+    padding: 0.62rem 0.9rem;
+    background: rgba(255, 248, 231, 0.95);
+    color: #34261d;
+    cursor: pointer;
+    border-radius: 8px;
+    font: inherit;
+    font-weight: 600;
+}
+
+.editor-action.primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+    color: #fffdf8;
+}
+
+.editor-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
 }
 
 .editor-panel .MuiButton-root {
     text-transform: none;
-    border-radius: 999px;
+    border-radius: 8px;
     font-weight: 600;
 }
 
 .editor-panel .MuiButton-contained {
     background: linear-gradient(135deg, var(--accent), var(--accent-strong));
     color: #fffdf8;
-    box-shadow: 0 8px 16px rgba(120, 74, 24, 0.22);
+    box-shadow: none;
 }
 
 .editor-panel .MuiButton-outlined {
-    border-color: rgba(212, 162, 74, 0.34);
-    color: #f0d8a4;
+    border-color: rgba(63, 50, 41, 0.18);
+    color: #34261d;
 }
 
 .editor-panel .MuiOutlinedInput-root {
-    background: rgba(255, 248, 228, 0.96);
-    border-radius: 10px;
+    background: rgba(255, 251, 241, 0.98);
+    border-radius: 8px;
 }
 
 .editor-panel .MuiOutlinedInput-notchedOutline {
-    border-color: rgba(212, 162, 74, 0.34) !important;
+    border-color: rgba(63, 50, 41, 0.18) !important;
 }
 
 .editor-panel .Mui-focused .MuiOutlinedInput-notchedOutline {
-    border-color: rgba(212, 162, 74, 0.8) !important;
+    border-color: rgba(63, 50, 41, 0.36) !important;
 }
 
 .editor-panel .MuiInputLabel-root {
-    color: #d8b877 !important;
+    color: #6d553c !important;
 }
 
 .editor-panel .MuiInputBase-input,

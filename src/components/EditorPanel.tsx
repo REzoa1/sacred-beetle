@@ -1,17 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   Box,
-  Button,
   FormControl,
   InputLabel,
   MenuItem,
   Select,
-  Stack,
   TextField,
   Typography,
 } from '@mui/material'
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined'
-import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined'
 import type { Scripture } from '../types/scripture'
 
 interface EditorPanelProps {
@@ -59,23 +55,23 @@ function EditorPanel({ scripture, onSave, onDelete }: EditorPanelProps) {
   }
 
   return (
-    <section className="panel editor-panel">
-      <div className="panel-header">
+    <section className="editor-shell">
+      <div className="editor-toolbar">
         <div>
-          <h2>Редактор</h2>
-          <p className="panel-subtitle">{helperText}</p>
+          <h3>Редактор</h3>
+          <p>{helperText}</p>
         </div>
-        <Stack direction="row" spacing={1}>
-          <Button variant="outlined" color="inherit" startIcon={<DeleteOutlineOutlinedIcon />} onClick={onDelete}>
+        <div className="editor-actions">
+          <button type="button" className="editor-action" onClick={onDelete}>
             Удалить
-          </Button>
-          <Button variant="contained" startIcon={<SaveOutlinedIcon />} onClick={handleSave}>
+          </button>
+          <button type="button" className="editor-action primary" onClick={handleSave}>
             Сохранить
-          </Button>
-        </Stack>
+          </button>
+        </div>
       </div>
 
-      <Box component="form" noValidate sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box component="form" noValidate className="editor-form">
         <TextField
           label="Название"
           value={title}
