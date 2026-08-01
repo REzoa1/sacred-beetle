@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { normalizeScripture } from '../src/services/scriptureService.ts';
+import { getBackendCandidates, normalizeScripture } from '../src/services/scriptureService.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -39,4 +39,11 @@ test('default scriptures are present in frontend and backend data files', () => 
     assert.ok(frontendTitles.includes(title), `Frontend missing: ${title}`);
     assert.ok(backendTitles.includes(title), `Backend missing: ${title}`);
   }
+});
+
+test('backend candidates include local and remote endpoints', () => {
+  const candidates = getBackendCandidates();
+
+  assert.ok(candidates.includes('http://localhost:3001/api/scriptures'));
+  assert.ok(candidates.includes('https://sacred-beetle-backend.onrender.com/api/scriptures'));
 });

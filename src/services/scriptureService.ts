@@ -22,7 +22,16 @@ export const normalizeScripture = (item: Record<string, unknown>): Scripture => 
   updatedAt: normalizeDate(item.updatedAt),
 });
 
-const BACKEND_URL = "https://sacred-beetle-backend.onrender.com/api/scriptures";
+const BACKEND_URLS = [
+  "http://localhost:3001/api/scriptures",
+  "https://sacred-beetle-backend.onrender.com/api/scriptures",
+];
+
+export const getBackendCandidates = (): string[] => [...BACKEND_URLS];
+
+const buildScriptureEndpoint = (backendUrl: string, scriptureId: string): string =>
+  `${backendUrl}/${encodeURIComponent(scriptureId)}`;
+
 const FALLBACK_DATA_URL = "/data/scriptures.json";
 
 const loadLocalScriptures = async (): Promise<Scripture[]> => {
@@ -48,23 +57,25 @@ const loadLocalScriptures = async (): Promise<Scripture[]> => {
 };
 
 export const loadScriptures = async (): Promise<ScriptureLoadResult> => {
-  try {
-    const response = await fetch(BACKEND_URL);
-    if (response.ok) {
-      const data = (await response.json()) as Record<string, unknown>[];
-      const scriptures = data.map((item) => normalizeScripture(item));
+  for (const backendUrl of BACKEND_URLS) {
+    try {
+      const response = await fetch(backendUrl);
+      if (response.ok) {
+        const data = (await response.json()) as Record<string, unknown>[];
+        const scriptures = data.map((item) => normalizeScripture(item));
 
-      if (scriptures.length >= 3) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(scriptures));
-        return {
-          scriptures,
-          source: "backend",
-          message: "Загружены тексты из бэкенда.",
-        };
+        if (scriptures.length >= 3) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(scriptures));
+          return {
+            scriptures,
+            source: "backend",
+            message: "Загружены тексты из бэкенда.",
+          };
+        }
       }
+    } catch {
+      // try the next backend candidate
     }
-  } catch {
-    // fallback below
   }
 
   try {
@@ -93,16 +104,19 @@ export const saveScripture = async (scripture: Scripture): Promise<void> => {
   );
   localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
 
-  try {
-    await fetch(`${BACKEND_URL}/${encodeURIComponent(scripture.id)}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(scripture),
-    });
-  } catch {
-    // keep local storage as fallback
+  for (const backendUrl of BACKEND_URLS) {
+    try {
+      await fetch(buildScriptureEndpoint(backendUrl, scripture.id), {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(scripture),
+      });
+      break;
+    } catch {
+      // keep local storage as fallback
+    }
   }
 };
 
@@ -112,12 +126,15 @@ export const deleteScripture = async (scriptureId: string): Promise<void> => {
   const next = current.filter((item) => item.id !== scriptureId);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
 
-  try {
-    await fetch(`${BACKEND_URL}/${encodeURIComponent(scriptureId)}`, {
-      method: "DELETE",
-    });
-  } catch {
-    // keep local storage as fallback
+  for (const backendUrl of BACKEND_URLS) {
+    try {
+      await fetch(buildScriptureEndpoint(backendUrl, scriptureId), {
+        method: "DELETE",
+      });
+      break;
+    } catch {
+      // keep local storage as fallback
+    }
   }
 };
 
@@ -126,15 +143,18 @@ export const saveScriptures = async (
 ): Promise<void> => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(scriptures));
 
-  try {
-    await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(scriptures),
-    });
-  } catch {
-    // keep local storage as fallback
+  for (const backendUrl of BACKEND_URLS) {
+    try {
+      await fetch(backendUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(scriptures),
+      });
+      break;
+    } catch {
+      // keep local storage as fallback
+    }
   }
 };

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Dialog, DialogContent, DialogTitle, IconButton, useMediaQuery } from "@mui/material";
+import { Dialog, DialogContent, DialogTitle, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import EditorPanel from "../components/EditorPanel";
 import ScriptureList from "../components/ScriptureList";
@@ -18,9 +18,7 @@ function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isReaderOpen, setIsReaderOpen] = useState(false);
-  const isMobile = useMediaQuery("(max-width: 900px)");
 
   const selectedScripture = useMemo(
     () => scriptures.find((item) => item.id === selectedId) ?? null,
@@ -54,7 +52,6 @@ function HomePage() {
       const loaded = await loadScriptures();
       setScriptures(loaded.scriptures);
       setSelectedId((current) => current || loaded.scriptures[0]?.id || "");
-      setStatusMessage(loaded.message ?? null);
       setIsLoading(false);
     };
 
@@ -72,17 +69,26 @@ function HomePage() {
     }
   }, [selectedId, visibleScriptures]);
 
+  useEffect(() => {
+    if (!selectedScripture || isEditing || scriptures.length === 0) {
+      return;
+    }
+
+    if (selectedId) {
+      setIsReaderOpen(false);
+    }
+  }, [selectedScripture, isEditing, scriptures.length, selectedId]);
+
   const handleSelect = (scriptureId: string) => {
     setSelectedId(scriptureId);
     setIsEditing(false);
-    if (isMobile) {
-      setIsReaderOpen(true);
-    }
+    setIsReaderOpen(true);
   };
 
   const handleEdit = (scriptureId: string) => {
     setSelectedId(scriptureId);
     setIsEditing(true);
+    setIsReaderOpen(false);
   };
 
   const handleSave = async (updated: Scripture) => {
@@ -92,7 +98,6 @@ function HomePage() {
     setScriptures(next);
     await saveScripture(updated);
     setIsEditing(false);
-    setStatusMessage("Сохранено и отправлено в backend.");
   };
 
   const handleCreate = async () => {
@@ -110,10 +115,8 @@ function HomePage() {
     setSelectedId(newScripture.id);
     setSelectedCategory("all");
     setIsEditing(true);
+    setIsReaderOpen(false);
     await saveScriptures(next);
-    setStatusMessage(
-      "Создан новый текст. Начните редактировать его прямо сейчас.",
-    );
   };
 
   const handleDelete = async () => {
@@ -125,8 +128,8 @@ function HomePage() {
     setScriptures(next);
     setSelectedId(next[0]?.id ?? "");
     setIsEditing(false);
+    setIsReaderOpen(false);
     await deleteScripture(selectedScripture.id);
-    setStatusMessage("Текст удалён из хранилища.");
   };
 
   if (isLoading) {
@@ -152,11 +155,7 @@ function HomePage() {
         </div>
       </header>
 
-      {statusMessage ? (
-        <div className="status-banner">{statusMessage}</div>
-      ) : null}
-
-      <main className="workspace">
+      <main className={`workspace ${isEditing ? "" : "single-column"}`}>
         <ScriptureList
           scriptures={visibleScriptures}
           selectedId={selectedId}
@@ -175,54 +174,31 @@ function HomePage() {
             onSave={handleSave}
             onDelete={handleDelete}
           />
-        ) : (
-          <section className="panel view-panel">
-            <div className="panel-header">
-              <div>
-                <h2>{selectedScripture?.title ?? "Выберите писание"}</h2>
-                <p className="panel-subtitle">
-                  {selectedScripture?.category ?? "Выберите текст из списка"}
-                </p>
-              </div>
-              {selectedScripture ? (
-                <span>
-                  {(() => {
-                    const value = selectedScripture.updatedAt;
-                    const date = value instanceof Date ? value : new Date(String(value ?? ""));
-                    return Number.isNaN(date.getTime())
-                      ? "—"
-                      : date.toLocaleDateString("ru-RU");
-                  })()}
-                </span>
-              ) : null}
-            </div>
-            {selectedScripture ? (
-              <div className="view-body">
-                <div className="quote-mark">“</div>
-                <p className="view-content">{selectedScripture.content}</p>
-              </div>
-            ) : (
-              <p className="view-content empty-view">
-                Выберите текст из списка, чтобы открыть его в режиме просмотра.
-              </p>
-            )}
-          </section>
-        )}
+        ) : null}
       </main>
 
-      <Dialog open={isReaderOpen && Boolean(selectedScripture) && isMobile} onClose={() => setIsReaderOpen(false)} fullWidth maxWidth="sm">
-        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Dialog
+        open={isReaderOpen && Boolean(selectedScripture)}
+        onClose={() => setIsReaderOpen(false)}
+        fullWidth
+        maxWidth="md"
+        slotProps={{ paper: { sx: { borderRadius: 3, background: 'linear-gradient(145deg, #f7ebc8 0%, #ead6a9 100%)', border: '1px solid rgba(139, 94, 45, 0.24)', boxShadow: '0 20px 40px rgba(0, 0, 0, 0.18)' } } }}
+      >
+        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(139, 94, 45, 0.16)', fontFamily: 'var(--font-heading)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
           <span>{selectedScripture?.title ?? 'Писание'}</span>
-          <IconButton onClick={() => setIsReaderOpen(false)} size="small">
+          <IconButton onClick={() => setIsReaderOpen(false)} size="small" sx={{ color: '#6a4522' }}>
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent dividers>
+        <DialogContent dividers sx={{ background: 'rgba(255, 248, 228, 0.68)', paddingTop: 3, paddingBottom: 3 }}>
           <div className="reader-illustration">
             <img src={`${import.meta.env.BASE_URL}juk.png`} alt="Святой жук" />
             <img src={`${import.meta.env.BASE_URL}juk_zloy.png`} alt="Ядовитый жук" />
           </div>
-          <p className="view-content reader-content">{selectedScripture?.content ?? ''}</p>
+          <div className="view-body reader-body">
+            <div className="quote-mark">“</div>
+            <p className="view-content reader-content">{selectedScripture?.content ?? ''}</p>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
