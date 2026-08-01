@@ -68,12 +68,23 @@ function HomePage() {
     }
   }, [selectedId, visibleScriptures]);
 
+  const handleSelect = (scriptureId: string) => {
+    setSelectedId(scriptureId);
+    setIsEditing(false);
+  };
+
+  const handleEdit = (scriptureId: string) => {
+    setSelectedId(scriptureId);
+    setIsEditing(true);
+  };
+
   const handleSave = async (updated: Scripture) => {
     const next = scriptures.map((item) =>
       item.id === updated.id ? updated : item,
     );
     setScriptures(next);
     await saveScripture(updated);
+    setIsEditing(false);
     setStatusMessage("Сохранено и отправлено в backend.");
   };
 
@@ -126,20 +137,6 @@ function HomePage() {
           </p>
         </div>
         <div className="hero-actions">
-          <button
-            type="button"
-            className={`mode-toggle ${isEditing ? "active" : ""}`}
-            onClick={() => setIsEditing(true)}
-          >
-            Редактировать
-          </button>
-          <button
-            type="button"
-            className={`mode-toggle ${!isEditing ? "active" : ""}`}
-            onClick={() => setIsEditing(false)}
-          >
-            Просмотр
-          </button>
           <img
             className="hero-symbol"
             src={`${import.meta.env.BASE_URL}juk.png`}
@@ -156,7 +153,8 @@ function HomePage() {
         <ScriptureList
           scriptures={visibleScriptures}
           selectedId={selectedId}
-          onSelect={setSelectedId}
+          onSelect={handleSelect}
+          onEdit={handleEdit}
           categories={categories}
           selectedCategory={selectedCategory}
           searchQuery={searchQuery}

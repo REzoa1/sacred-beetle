@@ -7,6 +7,7 @@ interface ScriptureListProps {
   searchQuery: string
   categories: string[]
   onSelect: (id: string) => void
+  onEdit: (id: string) => void
   onCategoryChange: (category: string) => void
   onSearchChange: (query: string) => void
   onCreate: () => void
@@ -19,6 +20,7 @@ function ScriptureList({
   searchQuery,
   categories,
   onSelect,
+  onEdit,
   onCategoryChange,
   onSearchChange,
   onCreate,
@@ -64,16 +66,27 @@ function ScriptureList({
           <div className="empty-list">Ничего не найдено по этому запросу.</div>
         ) : (
           scriptures.map((scripture) => (
-            <button
+            <div
               key={scripture.id}
-              type="button"
               className={`scripture-card ${selectedId === scripture.id ? 'active' : ''}`}
-              onClick={() => onSelect(scripture.id)}
             >
-              <strong>{scripture.title}</strong>
-              <span>{scripture.category}</span>
-              <p>{scripture.content.slice(0, 96)}{scripture.content.length > 96 ? '…' : ''}</p>
-            </button>
+              <button
+                type="button"
+                className="scripture-card-main"
+                onClick={() => onSelect(scripture.id)}
+              >
+                <strong>{scripture.title}</strong>
+                <span>{scripture.category}</span>
+                <p>{scripture.content.slice(0, 96)}{scripture.content.length > 96 ? '…' : ''}</p>
+              </button>
+              <button
+                type="button"
+                className="scripture-card-edit"
+                onClick={() => onEdit(scripture.id)}
+              >
+                ✎ Ред.
+              </button>
+            </div>
           ))
         )}
       </div>
