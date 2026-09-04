@@ -34,13 +34,13 @@
 * {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
-  -webkit-user-select: none;
-  user-select: none;
+  /* -webkit-user-select: none;
+  user-select: none; */
 }
 
 ::selection {
-  background: transparent;
-  color: inherit;
+  background: rgba(154, 123, 77, 0.58);
+  /* color: inherit; */
 }
 
 body,
@@ -1525,6 +1525,7 @@ body::after {
 
 .reader-dialog-content .reader-content {
   color: var(--brown);
+  white-space: pre-wrap;
 }
 
 @media (max-width: 500px) {

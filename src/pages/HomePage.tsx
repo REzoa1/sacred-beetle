@@ -118,8 +118,8 @@ function HomePage() {
   const handleCreate = () => {
     const newScripture: Scripture = {
       id: `scripture-${Date.now()}`,
-      title: "Новый текст",
-      content: "Начните писать новое писание здесь…",
+      title: "",
+      content: "",
       category: "Священные тексты",
       createdAt: new Date(),
       updatedAt: new Date(),
