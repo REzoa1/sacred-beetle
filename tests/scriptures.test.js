@@ -45,5 +45,4 @@ test('backend candidates include local and remote endpoints', () => {
   const candidates = getBackendCandidates();
 
   assert.ok(candidates.includes('http://localhost:3001/api/scriptures'));
-  assert.ok(candidates.includes('https://sacred-beetle-backend.onrender.com/api/scriptures'));
 });

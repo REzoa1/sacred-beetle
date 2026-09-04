@@ -24,7 +24,7 @@ export const normalizeScripture = (item: Record<string, unknown>): Scripture => 
 
 const BACKEND_URLS = [
   // "http://localhost:3001/api/scriptures",
-  "https://sacred-beetle-backend.onrender.com/api/scriptures",
+  "https://sacred-beetle-backend.relaxdev.ru/api/scriptures",
 ];
 
 export const getBackendCandidates = (): string[] => [...BACKEND_URLS];

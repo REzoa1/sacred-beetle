@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Box,
   FormControl,
@@ -13,10 +13,9 @@ import type { Scripture } from '../types/scripture'
 interface EditorPanelProps {
   scripture: Scripture | null
   onSave: (updated: Scripture) => void
-  onDelete: () => void
 }
 
-function EditorPanel({ scripture, onSave, onDelete }: EditorPanelProps) {
+function EditorPanel({ scripture, onSave }: EditorPanelProps) {
   const [title, setTitle] = useState('')
   const [category, setCategory] = useState('Священные тексты')
   const [content, setContent] = useState('')
@@ -27,19 +26,11 @@ function EditorPanel({ scripture, onSave, onDelete }: EditorPanelProps) {
     setContent(scripture?.content ?? '')
   }, [scripture])
 
-  const helperText = useMemo(() => {
-    if (!scripture) {
-      return 'Выберите текст из списка, чтобы открыть редактор.'
-    }
-
-    return `Редактируете: ${scripture.title}`
-  }, [scripture])
-
   if (!scripture) {
     return (
       <section className="panel editor-panel empty-state">
         <Typography variant="h6">Выберите писание</Typography>
-        <Typography color="text.secondary">{helperText}</Typography>
+        <Typography color="text.secondary">Выберите текст из списка, чтобы открыть редактор.</Typography>
       </section>
     )
   }
@@ -56,22 +47,16 @@ function EditorPanel({ scripture, onSave, onDelete }: EditorPanelProps) {
 
   return (
     <section className="editor-shell">
-      <div className="editor-toolbar">
-        <div>
-          <h3>Редактор</h3>
-          <p>{helperText}</p>
-        </div>
-        <div className="editor-actions">
-          <button type="button" className="editor-action" onClick={onDelete}>
-            Удалить
-          </button>
-          <button type="button" className="editor-action primary" onClick={handleSave}>
-            Сохранить
-          </button>
-        </div>
-      </div>
-
-      <Box component="form" noValidate className="editor-form">
+      <Box
+        component="form"
+        id="scripture-editor-form"
+        noValidate
+        className="editor-form"
+        onSubmit={(event) => {
+          event.preventDefault()
+          handleSave()
+        }}
+      >
         <TextField
           label="Название"
           value={title}

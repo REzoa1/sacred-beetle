@@ -19,10 +19,13 @@ function HomePage() {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isReaderOpen, setIsReaderOpen] = useState(false);
+  const [savedScriptureIds, setSavedScriptureIds] = useState<string[]>([]);
+  const [draftScripture, setDraftScripture] = useState<Scripture | null>(null);
+  const [isPageScrolled, setIsPageScrolled] = useState(false);
 
   const selectedScripture = useMemo(
-    () => scriptures.find((item) => item.id === selectedId) ?? null,
-    [scriptures, selectedId],
+    () => draftScripture ?? scriptures.find((item) => item.id === selectedId) ?? null,
+    [draftScripture, scriptures, selectedId],
   );
 
   const categories = useMemo(() => {
@@ -48,9 +51,20 @@ function HomePage() {
   }, [scriptures, selectedCategory, searchQuery]);
 
   useEffect(() => {
+    const handleScroll = () => {
+      setIsPageScrolled(window.scrollY > 220);
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
     const hydrate = async () => {
       const loaded = await loadScriptures();
       setScriptures(loaded.scriptures);
+      setSavedScriptureIds(loaded.scriptures.map((item) => item.id));
       setSelectedId((current) => current || loaded.scriptures[0]?.id || "");
       setIsLoading(false);
     };
@@ -70,27 +84,38 @@ function HomePage() {
   }, [selectedId, visibleScriptures]);
 
   const handleSelect = (scriptureId: string) => {
+    setDraftScripture(null);
     setSelectedId(scriptureId);
     setIsEditorOpen(false);
     setIsReaderOpen(true);
   };
 
   const handleEdit = (scriptureId: string) => {
+    setDraftScripture(null);
     setSelectedId(scriptureId);
     setIsEditorOpen(true);
     setIsReaderOpen(false);
   };
 
   const handleSave = async (updated: Scripture) => {
-    const next = scriptures.map((item) =>
-      item.id === updated.id ? updated : item,
-    );
+    const isDraft = draftScripture?.id === updated.id;
+    const next = isDraft
+      ? [updated, ...scriptures]
+      : scriptures.map((item) => (item.id === updated.id ? updated : item));
     setScriptures(next);
-    await saveScripture(updated);
+
+    if (!isDraft && savedScriptureIds.includes(updated.id)) {
+      await saveScripture(updated);
+    } else {
+      await saveScriptures(next);
+      setSavedScriptureIds((current) => [...current, updated.id]);
+    }
+
+    setDraftScripture(null);
     setIsEditorOpen(false);
   };
 
-  const handleCreate = async () => {
+  const handleCreate = () => {
     const newScripture: Scripture = {
       id: `scripture-${Date.now()}`,
       title: "Новый текст",
@@ -100,26 +125,11 @@ function HomePage() {
       updatedAt: new Date(),
     };
 
-    const next = [newScripture, ...scriptures];
-    setScriptures(next);
+    setDraftScripture(newScripture);
     setSelectedId(newScripture.id);
     setSelectedCategory("all");
     setIsEditorOpen(true);
     setIsReaderOpen(false);
-    await saveScriptures(next);
-  };
-
-  const handleDelete = async () => {
-    if (!selectedScripture) {
-      return;
-    }
-
-    const next = scriptures.filter((item) => item.id !== selectedScripture.id);
-    setScriptures(next);
-    setSelectedId(next[0]?.id ?? "");
-    setIsEditorOpen(false);
-    setIsReaderOpen(false);
-    await deleteScripture(selectedScripture.id);
   };
 
   if (isLoading) {
@@ -129,6 +139,10 @@ function HomePage() {
   return (
     <div className="page-shell">
       <header className="hero">
+        <button className="menu-button" type="button" aria-label="Открыть меню">☰</button>
+        <span className="hero-branch" aria-hidden="true" />
+        <span className="hero-medallion" aria-hidden="true" />
+        <img className="hero-beetle" src={`${import.meta.env.BASE_URL}juk.png`} alt="" />
         <div className="hero-copy">
           <p className="eyebrow">Религия святого жука</p>
           <h1>Хранилище писаний</h1>
@@ -145,70 +159,98 @@ function HomePage() {
         </div>
       </header>
 
-      <main className="workspace single-column">
-        <ScriptureList
-          scriptures={visibleScriptures}
-          selectedId={selectedId}
-          onSelect={handleSelect}
-          onEdit={handleEdit}
-          onDelete={async (scriptureId) => {
-            const target = scriptures.find((item) => item.id === scriptureId);
-            if (!target) {
-              return;
-            }
+      <div className={`content-body ${isPageScrolled ? "is-scrolled" : ""}`}>
+        <main className="workspace single-column">
+          <ScriptureList
+            scriptures={visibleScriptures}
+            selectedId={selectedId}
+            onSelect={handleSelect}
+            onEdit={handleEdit}
+            onDelete={async (scriptureId) => {
+              const target = scriptures.find((item) => item.id === scriptureId);
+              if (!target) {
+                return;
+              }
 
-            const next = scriptures.filter((item) => item.id !== scriptureId);
-            setScriptures(next);
-            setSelectedId(next[0]?.id ?? "");
-            setIsEditorOpen(false);
-            setIsReaderOpen(false);
-            await deleteScripture(scriptureId);
-          }}
-          categories={categories}
-          selectedCategory={selectedCategory}
-          searchQuery={searchQuery}
-          onCategoryChange={setSelectedCategory}
-          onSearchChange={setSearchQuery}
-          onCreate={handleCreate}
-        />
-      </main>
+              const next = scriptures.filter((item) => item.id !== scriptureId);
+              setScriptures(next);
+              setSelectedId(next[0]?.id ?? "");
+              setIsEditorOpen(false);
+              setIsReaderOpen(false);
+              await deleteScripture(scriptureId);
+            }}
+            categories={categories}
+            selectedCategory={selectedCategory}
+            searchQuery={searchQuery}
+            onCategoryChange={setSelectedCategory}
+            onSearchChange={setSearchQuery}
+            onCreate={handleCreate}
+          />
+        </main>
+
+        <footer className="blessing">
+          <div className="blessing-medallion">
+            <img src={`${import.meta.env.BASE_URL}juk.png`} alt="" />
+          </div>
+          <div className="blessing-copy">
+            <p>Да благословит Святой Жук<br />всех искателей истины.</p>
+            <span className="blessing-ornament" aria-hidden="true" />
+          </div>
+          <div className="blessing-stars" aria-hidden="true" />
+        </footer>
+      </div>
 
       <Dialog
+        className="editor-dialog"
         open={isEditorOpen && Boolean(selectedScripture)}
-        onClose={() => setIsEditorOpen(false)}
+        onClose={() => {
+          setDraftScripture(null);
+          setIsEditorOpen(false);
+        }}
         fullWidth
         maxWidth="md"
-        slotProps={{ paper: { sx: { borderRadius: 3, background: 'linear-gradient(145deg, #f8edd4 0%, #ebd7ad 100%)', border: '1px solid rgba(102, 68, 38, 0.2)', boxShadow: '0 18px 44px rgba(80, 50, 26, 0.16)' } } }}
+        slotProps={{ paper: { className: 'editor-dialog-paper' } }}
       >
-        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(102, 68, 38, 0.12)', fontFamily: 'var(--font-heading)', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#4b3320' }}>
-          <span>Редактор писания</span>
-          <IconButton onClick={() => setIsEditorOpen(false)} size="small" sx={{ color: '#6a4522' }}>
+        <DialogTitle className="editor-dialog-title">
+          <span>{draftScripture ? "Создание писания" : "Редактирование писания"}</span>
+          <IconButton
+            onClick={() => {
+              setDraftScripture(null);
+              setIsEditorOpen(false);
+            }}
+            size="small"
+          >
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent dividers sx={{ background: 'rgba(255, 248, 230, 0.76)', paddingTop: 2, paddingBottom: 2 }}>
+        <DialogContent className="editor-dialog-content" dividers>
           <EditorPanel
             scripture={selectedScripture}
             onSave={handleSave}
-            onDelete={handleDelete}
           />
         </DialogContent>
+        <div className="editor-dialog-footer">
+          <button type="submit" className="editor-action primary" form="scripture-editor-form">
+            Сохранить
+          </button>
+        </div>
       </Dialog>
 
       <Dialog
+        className="reader-dialog"
         open={isReaderOpen && Boolean(selectedScripture)}
         onClose={() => setIsReaderOpen(false)}
         fullWidth
         maxWidth="md"
-        slotProps={{ paper: { sx: { borderRadius: 3, background: 'linear-gradient(145deg, #f7ebc8 0%, #ead6a9 100%)', border: '1px solid rgba(139, 94, 45, 0.24)', boxShadow: '0 20px 40px rgba(0, 0, 0, 0.18)' } } }}
+        slotProps={{ paper: { className: 'reader-dialog-paper' } }}
       >
-        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(139, 94, 45, 0.16)', fontFamily: 'var(--font-heading)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+        <DialogTitle className="reader-dialog-title">
           <span>{selectedScripture?.title ?? 'Писание'}</span>
-          <IconButton onClick={() => setIsReaderOpen(false)} size="small" sx={{ color: '#6a4522' }}>
+          <IconButton onClick={() => setIsReaderOpen(false)} size="small">
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent dividers sx={{ background: 'rgba(255, 248, 228, 0.68)', paddingTop: 3, paddingBottom: 3 }}>
+        <DialogContent className="reader-dialog-content" dividers>
           <div className="reader-illustration">
             <img src={`${import.meta.env.BASE_URL}juk.png`} alt="Святой жук" />
             <img src={`${import.meta.env.BASE_URL}juk_zloy.png`} alt="Ядовитый жук" />
@@ -219,6 +261,7 @@ function HomePage() {
           </div>
         </DialogContent>
       </Dialog>
+
     </div>
   );
 }
