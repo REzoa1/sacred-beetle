@@ -1,6 +1,6 @@
 import type { Scripture } from "../types/scripture";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import DeleteIcon from "@mui/icons-material/Delete";
+import AlertDialog from "./AlertDialog";
 
 interface ScriptureListProps {
   scriptures: Scripture[];
@@ -123,17 +123,8 @@ function ScriptureList({
                 >
                   <EditOutlinedIcon fontSize="small" />
                 </button>
-                <button
-                  type="button"
-                  className="scripture-card-delete"
-                  aria-label={`Удалить: ${scripture.title}`}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    onDelete(scripture.id);
-                  }}
-                >
-                  <DeleteIcon fontSize="small" />
-                </button>
+
+                <AlertDialog scripture={scripture} onDelete={onDelete} />
               </div>
               <span className="scripture-arrow" aria-hidden="true" />
             </div>
